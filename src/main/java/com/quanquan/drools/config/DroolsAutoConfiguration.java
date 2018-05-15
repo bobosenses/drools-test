@@ -37,6 +37,8 @@ public class DroolsAutoConfiguration {
         ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
         return resourcePatternResolver.getResources("classpath*:" + RULES_PATH + "**/*.*");
     }
+
+
     
     @Bean
     @ConditionalOnMissingBean(KieContainer.class)

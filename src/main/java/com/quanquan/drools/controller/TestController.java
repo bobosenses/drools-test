@@ -1,6 +1,7 @@
 package com.quanquan.drools.controller;
 
 import com.quanquan.drools.model.Address;
+import com.quanquan.drools.model.OrderLine;
 import com.quanquan.drools.model.fact.AddressCheckResult;
 import com.quanquan.drools.service.ReloadDroolsRulesService;
 import org.kie.api.runtime.KieSession;
@@ -39,6 +40,29 @@ public class TestController {
 
     }
 
+    @ResponseBody
+    @RequestMapping("/orderLine")
+    public void orderLine(){
+        OrderLine orderLine = new OrderLine();
+        orderLine.setStatus("200");
+        KieSession kieSession = ReloadDroolsRulesService.kieContainer.newKieSession();
+
+//        AddressCheckResult result = new AddressCheckResult();
+        kieSession.insert(orderLine);
+//        kieSession.insert(result);
+        int ruleFiredCount = kieSession.fireAllRules();
+        kieSession.destroy();
+        System.out.println("触发了" + ruleFiredCount + "条规则");
+        if (!orderLine.getPass()) {
+            System.out.println("规则校验成功！");
+        }
+//        if(result.isPostCodeResult()){
+//            System.out.println("规则校验通过");
+//        }
+
+    }
+
+
     /**
      * 从数据加载最新规则
      * @return
@@ -49,22 +73,6 @@ public class TestController {
     public String reload() throws IOException {
         rules.reload();
         return "ok";
-    }
-
-    public static void main(String[] args) {
-        String abc = "package plausibcheck.adress\n" +
-                "\n" +
-                "import Address;\n" +
-                "import AddressCheckResult;\n" +
-                "\n" +
-                "rule \"Postcode should be filled with exactly 5 numbers\"\n" +
-                "    when\n" +
-                "        address : Address(postcode != null, postcode matches \"([0-9]{5})\")\n" +
-                "        checkResult : AddressCheckResult();\n" +
-                "    then\n" +
-                "        checkResult.setPostCodeResult(true);\n" +
-                "\t\tSystem.out.println(\"规则中打印日志：校验通过!\");\n" +
-                "end";
     }
 
     /**

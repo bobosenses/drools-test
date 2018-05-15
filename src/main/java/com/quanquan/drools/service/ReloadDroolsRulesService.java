@@ -43,7 +43,7 @@ public class ReloadDroolsRulesService {
         KieFileSystem kfs = ks.newKieFileSystem();
 
         for (Rule rule:rules) {
-            String  drl=rule.getContent();
+            String drl=rule.getContent();
             kfs.write("src/main/resources/" + drl.hashCode() + ".drl", drl);
         }
 

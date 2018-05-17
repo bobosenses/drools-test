@@ -25,7 +25,9 @@ import org.springframework.boot.ansi.AnsiOutput;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class DdLoadTest {
@@ -126,13 +128,59 @@ public class DdLoadTest {
 		List<Model> modelList = new ArrayList<Model>();
 		Model model = new Model();
 		model.setField("status");
-		model.setSearchOperator(SearchOperator.gt.getSymbol());
+		model.setSearchOperator(SearchOperator.eq.getSymbol());
 		model.setValue("200");
 		modelList.add(model);
 		Result result = new Result();
 		result.setField("pass");
-		result.setValue("200");
-		System.out.println(DrlUtils.toRrl(list, ruleName, orderLine, modelList, result));
+		result.setPass(true);
+		System.out.println(DrlUtils.toRrl(ruleName, orderLine, modelList, result));
+	}
+
+	@Test
+	public void test1 () {
+		String ruleName = "rule_" + generateRandom(4);
+		List<Object> list = new ArrayList<Object>();
+		OrderLine orderLine = new OrderLine();
+		//获取实体所有字段的类型和字段名
+		Map<String, String> entityField = new HashMap<String, String>();
+		for (Field field : orderLine.getClass().getDeclaredFields()) {
+			entityField.put(field.getName(), field.getType().getSimpleName());
+		}
+		Rule rule = new Rule();
+		list.add(orderLine);
+		list.add(rule);
+		List<Model> modelList = new ArrayList<Model>();
+		Model model = new Model();
+		model.setField("status");
+		model.setFieldType(entityField.get(model.getField()));
+		model.setSearchOperator(SearchOperator.eq.getSymbol());
+		model.setValue("200");
+		modelList.add(model);
+		Model model1 = new Model();
+		model1.setField("num");
+		model1.setSearchOperator(SearchOperator.lt.getSymbol());
+		model1.setValue("200");
+		modelList.add(model1);
+		Result result = new Result();
+		result.setField("pass");
+		result.setPass(true);
+		System.out.println(DrlUtils.toRrl(ruleName, orderLine, modelList, result));
+	}
+
+	/**
+	 * 生成随机数
+	 * @param num
+	 * @return
+	 */
+	public String generateRandom(int num) {
+		String chars = "0123456789";
+		StringBuffer number=new StringBuffer();
+		for (int i = 0; i < num; i++) {
+			int rand = (int) (Math.random() * 10);
+			number=number.append(chars.charAt(rand));
+		}
+		return number.toString();
 	}
 }
 

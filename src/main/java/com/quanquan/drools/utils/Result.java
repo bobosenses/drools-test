@@ -6,7 +6,7 @@ public class Result {
 
     private String value;
 
-    private boolean pass;
+    private Boolean pass;
 
     public String getValue() {
         return value;

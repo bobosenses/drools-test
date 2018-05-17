@@ -2,6 +2,8 @@ package com.quanquan.drools.utils;
 
 public class Model {
 
+    //字段类型
+    private String fieldType;
     //字段名
     private String field;
     //操作名
@@ -31,5 +33,13 @@ public class Model {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getFieldType() {
+        return fieldType;
+    }
+
+    public void setFieldType(String fieldType) {
+        this.fieldType = fieldType;
     }
 }

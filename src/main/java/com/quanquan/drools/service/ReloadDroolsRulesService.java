@@ -30,7 +30,7 @@ public class ReloadDroolsRulesService {
         this.kieContainer=kieContainer;
     }
 
-    private List<Rule>  loadRules(){
+    public List<Rule>  loadRules(){
         List<Rule> rules=ruleRepository.findAll();
 //        System.out.println(rules.toString());
         return rules;

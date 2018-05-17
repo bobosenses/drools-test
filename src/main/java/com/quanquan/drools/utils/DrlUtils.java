@@ -1,5 +1,7 @@
 package com.quanquan.drools.utils;
 
+import com.quanquan.drools.model.Rule;
+
 import java.util.List;
 
 public class DrlUtils {
@@ -8,24 +10,22 @@ public class DrlUtils {
     private final static String mark = "\"";
 
     /**
-     * @param entities 实体集合
      * @param ruleName 规则名称
      * @param obj 规则对象
      * @param modelList 参数集合
      * @param result 结果对象
      * @return
      */
-    public static String toRrl (List<Object> entities, String ruleName, Object obj, List<Model> modelList, Result result) {
+    public static String toRrl (String ruleName, Object obj, List<Model> modelList, Result result) {
         StringBuffer sb = new StringBuffer();
         //package
         sb.append("package rules" + newLine + newLine);
         //import
-        for (Object o : entities) {
-            sb.append("import "  + o.getClass().getName() + newLine);
-        }
+        sb.append("import "  + Rule.class.getName() + newLine);
+        sb.append("import "  + obj.getClass().getName() + newLine);
         sb.append(newLine);
         //ruleName
-        sb.append("rule " + mark + ruleName + mark);
+        sb.append("rule " + mark + ruleName + mark + newLine);
         //some description
         sb.append(tab + "no-loop true" + newLine);
         sb.append(tab + "lock-on-active true" + newLine);
@@ -39,18 +39,20 @@ public class DrlUtils {
         //when
         sb.append(tab + "when" + newLine);
         //content
-        if (modelList.size() > 1) {
-            sb.append(tab + tab + "$s :" + obj.getClass().getSimpleName() + "(" + modelList.get(0).getField() + modelList.get(0).getSearchOperator() + addMarks(modelList.get(0).getValue()) + ")" + newLine);
+        sb.append(tab + tab + "$s :" + obj.getClass().getSimpleName() + "(");
+        if (modelList.size() < 2) {
+//            sb.append( modelList.get(0).getField() + modelList.get(0).getSearchOperator() + addMarks(modelList.get(0).getValue()) + ")" + newLine);
+            sb.append(addMarks(modelList.get(0)) + newLine);
         } else {
             for (int j = 0; j < modelList.size(); j++) {
                 if (j == 0) {
-                    sb.append(tab + tab + "$s :" + obj.getClass().getSimpleName() + "(" + modelList.get(0).getField() + modelList.get(0).getSearchOperator() + addMarks(modelList.get(0).getValue()));
+                    sb.append(addMarks(modelList.get(0)));
                 } else {
-                    sb.append("&&" + modelList.get(j).getField() + modelList.get(j).getSearchOperator() + addMarks(modelList.get(j).getValue()));
+                    sb.append(" && " + addMarks(modelList.get(j)));
                 }
             }
-            sb.append(")" + newLine);
         }
+        sb.append(")" + newLine);
         //then
         sb.append(tab + "then" + newLine);
         sb.append(tab + tab + "$s." + "set" + result.getField().substring(0,1).toUpperCase()+ result.getField().substring(1) + "(" + result.getPass() + ");" + newLine);
@@ -61,7 +63,12 @@ public class DrlUtils {
         return sb.toString();
     }
 
-    public static String addMarks (String text) {
-        return "\\'" + text + "\\'";
+    public static String addMarks (Model model) {
+
+        if ("String".equals(model.getFieldType())) {
+            String equal = "=";
+            return model.getField() + (model.getSearchOperator().equals(equal) ? "==" : model.getSearchOperator()) + "\\'" + model.getValue() + "\\'";
+        }
+        return model.getField() + model.getSearchOperator() + model.getValue();
     }
 }

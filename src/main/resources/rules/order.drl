@@ -8,8 +8,8 @@ rule "my rule"
     lock-on-active true
     salience 1
     when
-        $s :OrderLine(status=="200")
+        $s :OrderLine(status=="500")
     then
-        $s.setPass(false);
+        $s.setPass(true);
         update($s);
 end
